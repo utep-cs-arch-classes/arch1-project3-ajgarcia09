@@ -37,13 +37,20 @@ Layer layer5 = {
   0,
 };
 
+Layer triangleLayer = {		/* tree trunk as a layer */
+  (AbShape *) &rect10,
+  {screenWidth/2, (screenHeight/2)+15},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_GREEN,
+  &layer5,
+};
 
 Layer trunkLayer = {		/* tree trunk as a layer */
   (AbShape *) &rect10,
   {screenWidth/2, (screenHeight/2)+40},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_BLACK,
-  &layer5,
+  &triangleLayer,
 };
 
 Layer layer4 = {		/**< Layer with a purple circle */
