@@ -25,17 +25,29 @@ AbRectOutline fieldOutline = {	/* playing field */
   {screenWidth/2 - 10, screenHeight/2 - 10}
 };
 
-Layer layer4 = {
+
+
+
+
+Layer layer5 = {
   (AbShape *)&rightArrow,
   {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_PINK,
-  0
+  0,
+};
+
+Layer layer4 = {		/**< Layer with an orange circle */
+  (AbShape *)&circle4,
+  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_VIOLET,
+  &layer5,
 };
   
 
-Layer layer3 = {		/**< Layer with an orange circle */
-  (AbShape *)&circle8,
+Layer layer3 = {		/**< Layer with an orange circle (originally)*/
+  (AbShape *)&circle4,
   {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_VIOLET,
@@ -60,10 +72,10 @@ Layer layer1 = {		/**< Layer with a red square */
 };
 
 Layer layer0 = {		/**< Layer with an orange circle */
-  (AbShape *)&circle14,
+  (AbShape *)&circle4,
   {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
+  COLOR_VIOLET,
   &layer1,
 };
 
@@ -78,14 +90,11 @@ typedef struct MovLayer_s {
 } MovLayer;
 
 /* initial value of {0,0} will be overwritten */
-MovLayer ml3 = { &layer3, {1,1}, 0 }; /**< not all layers move */
+ /**< not all layers move should be violet circle too*/
+MovLayer ml4 = { &layer4, {2,2}, 0 };
+MovLayer ml3 = { &layer3, {1,1}, &ml4 }; //violet circle
 MovLayer ml1 = { &layer1, {1,2}, &ml3 }; 
-MovLayer ml0 = { &layer0, {2,1}, &ml1 }; 
-
-
-
-
-
+MovLayer ml0 = { &layer0, {2,1}, &ml1 };//violet circle  
 
 
 movLayerDraw(MovLayer *movLayers, Layer *layers)
