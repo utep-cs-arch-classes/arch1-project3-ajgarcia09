@@ -37,18 +37,18 @@ Layer layer5 = {
   0,
 };
 
-Layer layer4 = {		/**< Layer with an orange circle */
+Layer layer4 = {		/**< Layer with a purple circle */
   (AbShape *)&circle4,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+  {(screenWidth/2)+10, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_VIOLET,
   &layer5,
 };
   
 
-Layer layer3 = {		/**< Layer with an orange circle (originally)*/
+Layer layer3 = {		/**< Layer with a purple circle (originally)*/
   (AbShape *)&circle4,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+  {(screenWidth/2)-45, (screenHeight/2)-55}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_VIOLET,
   &layer4,
@@ -65,15 +65,15 @@ Layer fieldLayer = {		/* playing field as a layer */
 
 Layer layer1 = {		/**< Layer with a red square */
   (AbShape *)&rect10,
-  {screenWidth/2, screenHeight/2}, /**< center */
+  {screenWidth/2,(screenHeight/2)-58}, /**< center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_RED,
   &fieldLayer,
 };
 
-Layer layer0 = {		/**< Layer with an orange circle */
+Layer layer0 = {		/**< Layer with purple circle */
   (AbShape *)&circle4,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+  {(screenWidth/2)+20, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_VIOLET,
   &layer1,
