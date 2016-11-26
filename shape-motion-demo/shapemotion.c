@@ -37,12 +37,21 @@ Layer layer5 = {
   0,
 };
 
+
+Layer trunkLayer = {		/* tree trunk as a layer */
+  (AbShape *) &rect10,
+  {screenWidth/2, (screenHeight/2)+40},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_BLACK,
+  &layer5,
+};
+
 Layer layer4 = {		/**< Layer with a purple circle */
   (AbShape *)&circle4,
   {(screenWidth/2)+10, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_VIOLET,
-  &layer5,
+  &trunkLayer,
 };
   
 
@@ -60,7 +69,7 @@ Layer fieldLayer = {		/* playing field as a layer */
   {screenWidth/2, screenHeight/2},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_BLACK,
-  &layer3
+  &layer3,
 };
 
 Layer layer1 = {		/**< Layer with a red square */
@@ -91,7 +100,8 @@ typedef struct MovLayer_s {
 
 /* initial value of {0,0} will be overwritten */
  /**< not all layers move should be violet circle too*/
-MovLayer ml4 = { &layer4, {2,2}, 0 };
+
+MovLayer ml4 = { &layer4, {2,2}, 0};
 MovLayer ml3 = { &layer3, {1,1}, &ml4 }; //violet circle
 MovLayer ml1 = { &layer1, {1,2}, &ml3 }; 
 MovLayer ml0 = { &layer0, {2,1}, &ml1 };//violet circle  
