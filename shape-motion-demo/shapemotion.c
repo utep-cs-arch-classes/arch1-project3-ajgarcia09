@@ -17,60 +17,100 @@
 #define GREEN_LED BIT6
 
 
-AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
-AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 30};
+AbRect rect10 = {abRectGetBounds, abRectCheck, {5,10}}; /**< 10x10 rectangle */
+AbRect rect5 = {abRectGetBounds, abRectCheck, {10,15}};
+
+AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 20};
+
+AbRect rect20 = {abRectGetBounds, abRectCheck, {10,30}}; /**< 10x10 rectangle */
 
 AbRectOutline fieldOutline = {	/* playing field */
   abRectOutlineGetBounds, abRectOutlineCheck,   
   {screenWidth/2 - 10, screenHeight/2 - 10}
 };
 
-
-
-
-
-Layer layer5 = {
-  (AbShape *)&rightArrow,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+Layer bandLayer1 = {
+  (AbShape *)&circle4,
+  {(screenWidth)/2, (screenHeight/2)}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_PINK,
+  COLOR_RED,
   0,
 };
 
-Layer starLayer = {		/* tree as a layer */
-  (AbShape *) &circle6,
-  {screenWidth/2, (screenHeight/2)-40},/**< center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_YELLOW,
-  &layer5,
-};
-
-Layer triangleLayer = {		/* tree as a layer */
-  (AbShape *) &rect10,
-  {screenWidth/2, (screenHeight/2)+15},/**< center */
+Layer wreathLayer = {
+  (AbShape *)&circle40,
+  {(screenWidth/2), (screenHeight/2)}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_GREEN,
+  &bandLayer1,
+};
+
+Layer starLayer = {		/* top red ornament as layer */
+  (AbShape *) &circle4,
+  {screenWidth/2, (screenHeight/2)-32},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_RED,
+  &wreathLayer,
+};
+
+Layer wreathCenterLayer = {		/* wreath center as a layer */
+  (AbShape *) &circle20,
+  {screenWidth/2, (screenHeight/2)},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_BLUE,
   &starLayer,
 };
 
-Layer trunkLayer = {		/* tree trunk as a layer */
-  (AbShape *) &rect10,
-  {screenWidth/2, (screenHeight/2)+40},/**< center */
+Layer ornament5Layer = {	    /* top right ornament as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2)-25, (screenHeight/2)-15},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  &triangleLayer,
+  COLOR_RED,
+  &wreathCenterLayer,
 };
 
-Layer layer4 = {		/**< Layer with a purple circle */
+Layer ornament4Layer = {	    /* top right ornament as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2)+25, (screenHeight/2)-15},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_RED,
+  &ornament5Layer,
+};
+
+Layer ornament3Layer = {	    /* bottom right ornament as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2)+30, (screenHeight/2)+10},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_RED,
+  &ornament4Layer,
+};
+
+Layer ornament2Layer = {	     /* bottom left ornament as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2)-30, (screenHeight/2)+10},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_RED,
+  &ornament3Layer,
+};
+
+Layer ornament1Layer = {	    /* bottom ornament as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2)-5, (screenHeight/2)+30},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_RED,
+  &ornament2Layer,
+};
+
+Layer layer4 = {	     /**< Layer with white moving circle */
   (AbShape *)&circle4,
   {(screenWidth/2)+10, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_WHITE,
-  &trunkLayer,
+  &ornament1Layer,
 };
   
 
-Layer layer3 = {		/**< Layer with a purple circle (originally)*/
+Layer layer3 = {	  /**< Layer with white moving circle */
   (AbShape *)&circle4,
   {(screenWidth/2)-45, (screenHeight/2)-55}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
@@ -79,7 +119,7 @@ Layer layer3 = {		/**< Layer with a purple circle (originally)*/
 };
 
 
-Layer fieldLayer = {		/* playing field as a layer */
+Layer fieldLayer = {		/* black outline */
   (AbShape *) &fieldOutline,
   {screenWidth/2, screenHeight/2},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
@@ -87,7 +127,7 @@ Layer fieldLayer = {		/* playing field as a layer */
   &layer3,
 };
 
-Layer layer1 = {		/**< Layer with a (was) red square */
+Layer layer1 = {	     /**< Layer with white moving circle */
   (AbShape *)&circle4,
   {screenWidth/2,(screenHeight/2)-58}, /**< center */
   {0,0}, {0,0},				    /* last & next pos */
@@ -95,7 +135,7 @@ Layer layer1 = {		/**< Layer with a (was) red square */
   &fieldLayer,
 };
 
-Layer layer0 = {		/**< Layer with purple circle */
+Layer layer0 = {	  /**< Layer with white moving circle */
   (AbShape *)&circle4,
   {(screenWidth/2)+20, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
@@ -203,9 +243,12 @@ void main()
   P1OUT |= GREEN_LED;
 
   configureClocks();
+
   lcd_init();
+    drawString5x7(20,20, "White Christmas", COLOR_GREEN, COLOR_RED);
   shapeInit();
   p2sw_init(1);
+
 
   shapeInit();
 
