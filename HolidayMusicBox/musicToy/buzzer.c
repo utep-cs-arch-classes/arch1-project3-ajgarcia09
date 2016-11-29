@@ -7,7 +7,7 @@
 
 /*Each array has a sequence of notes that play the given song. A "0" means a space in between each note. Sequences of the same note mean the note has a longer duration (E4,E4 would last twice as long as E4)*/
 
-int joy[] = {C5,C5,0,B4,0,A4,0,G4,G4,F4,0,E4,E4,0,D4,D4,0,D4,D4,0,G4,0,A4,A4,A4,0,A4,0,B4,B4,0,B4,0,C5,C5,C5,C5,-1};
+/*int joy[] = {C5,C5,0,B4,0,A4,0,G4,G4,F4,0,E4,E4,0,D4,D4,0,D4,D4,0,G4,0,A4,A4,A4,0,A4,0,B4,B4,0,B4,0,C5,C5,C5,C5,-1};*/
   
 int frosty[]={G4,G4,0,E4,0,F4,0,G4,0,C5,C5,B4,0,C5,0,D5,0,C5,B4,0,A4,0,G4,G4,0,B4,0,C5,0,D5,0,C5,0,B4,0,A4,0,A4,0,G4,0,C5,0,E4,0,G4,A4,0,G4,F4,E4,0,F4,G4,G4,G4,G4,-1};
 
@@ -29,14 +29,14 @@ void buzzer_init()
     P2DIR = BIT6;		/* enable output to speaker (P2.6) */
 }
 
-void playJoy(){
+/*void playJoy(){
   static int i =-1;
     i++;
     if(joy[i]==-1)
       i=0;
     buzzer_set_period(joy[i]);//play Twinkle Twinkle Little Star
     led_toggle(); 
-}
+    }*/
 
 void playFrosty(){
   static int a =-1;
@@ -70,7 +70,7 @@ void songChooser(){
     buzzer_set_period(0); //pause song that's playing
      break;
   case 2://button SW2
-    playJoy();
+    //playJoy();
     break;
   case 3://button SW3
     playFrosty();
