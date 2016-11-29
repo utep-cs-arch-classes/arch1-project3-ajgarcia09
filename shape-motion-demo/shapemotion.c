@@ -17,10 +17,12 @@
 #define GREEN_LED BIT6
 
 
-AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
+AbRect rect10by20 = {abRectGetBounds, abRectCheck, {10,20}}; /**< 10x10 rectangle */
 AbRect rect15by5 = {abRectGetBounds, abRectCheck, {15,5}};
 
-AbRect rect10by3 = {abRectGetBounds, abRectCheck, {10,3}};
+AbRect rect20by20 = {abRectGetBounds, abRectCheck, {20,20}};
+
+AbRect rect35by30 = {abRectGetBounds, abRectCheck, {35,30}};
 
 AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 20};
 
@@ -28,130 +30,90 @@ AbRect rect20 = {abRectGetBounds, abRectCheck, {10,30}}; /**< 10x10 rectangle */
 
 AbRectOutline fieldOutline = {	/* playing field */
   abRectOutlineGetBounds, abRectOutlineCheck,   
-  {screenWidth/2 - 10, screenHeight/2 - 10}
+  {20,20}
 };
 
-Layer leftArmLayer = {
-  (AbShape *)&rect10by3,
-  {(screenWidth/2)-25, (screenHeight/2)+10}, /**< black 10x3 rectangle */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  0,
-};
-
-Layer rightArmLayer = {
-  (AbShape *)&rect10by3,
-  {(screenWidth/2)+25, (screenHeight/2)+10}, /**< black 10x3 rectangle */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  &leftArmLayer,
-};
-
-Layer topHatLayer = {	  /* black 10x10 rectangle as a layer */
-  (AbShape *) &rect10,
+Layer chimneyTopLayer = {	  /* black 10x10 rectangle as a layer */
+  (AbShape *) &rect10by20,
   {(screenWidth/2), (screenHeight/2)-35},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  &rightArmLayer,
+  COLOR_RED,
+  0,
 
 };
 
-Layer topSnowBallLayer = {	    /* top white circle as a layer */
-  (AbShape *) &circle15,
-  {(screenWidth/2), (screenHeight/2)-15},/**< center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
-  &topHatLayer,
-};
-
-
-Layer hatRimLayer = {	    /* black 15x5 rectangle as a layer */
+Layer rimLayer = {	    /* black 15x5 rectangle as a layer */
   (AbShape *) &rect15by5,
   {(screenWidth/2), (screenHeight/2)-25},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  &topSnowBallLayer,
+  COLOR_RED,
+  &chimneyTopLayer,
 };
 
-Layer noseLayer = {	    /* nose orange circle as a layer */
-  (AbShape *) &circle4,
-  {(screenWidth/2), (screenHeight/2)-15},/**< center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
-  &hatRimLayer,
-};
 
-Layer middleSnowBallLayer = {	     /* middle white circle as a layer */
-  (AbShape *) &circle20,
+Layer chimneyLayer = {	     /* middle white circle as a layer */
+  (AbShape *) &rect35by30,
   {(screenWidth/2), (screenHeight/2)+10},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
-  &noseLayer,
+  COLOR_RED,
+  &rimLayer,
 };
 
-Layer bottomButtonLayer = {		/* wreath center as a layer */
-  (AbShape *) &circle4,
-  {screenWidth/2, (screenHeight/2)+8},/**< center */
+Layer firePlaceLayer = {	    /* bottom white circle as a layer */
+  (AbShape *) &rect20by20,
+  {(screenWidth/2), (screenHeight/2)+20},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_BLACK,
-  &middleSnowBallLayer,
+  &chimneyLayer,
 };
 
-Layer topButtonLayer = {		/* wreath center as a layer */
-  (AbShape *) &circle4,
-  {screenWidth/2, (screenHeight/2)+4},/**< center */
+Layer fireLayer = {		/* wreath center as a layer */
+  (AbShape *) &circle8,
+  {screenWidth/2, (screenHeight/2)+30},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
-  &bottomButtonLayer,
+  COLOR_ORANGE,
+  &firePlaceLayer,
 };
 
-Layer bottomSnowBallLayer = {	    /* bottom white circle as a layer */
-  (AbShape *) &circle25,
-  {(screenWidth/2), (screenHeight/2)+40},/**< center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
-  &topButtonLayer,
-};
-
-Layer layer4 = {	     /**< Layer with white moving circle */
+Layer layer4 = {	     /**< Layer with orange  moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2)+10, (screenHeight/2)-50}, /**< bit below & right of center */
+  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
-  &bottomSnowBallLayer,
+  COLOR_ORANGE,
+  &fireLayer,
 };
   
 
-Layer layer3 = {	  /**< Layer with white moving circle */
+Layer layer3 = {	  /**< Layer with orange moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2)-45, (screenHeight/2)-55}, /**< bit below & right of center */
+  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
+  COLOR_ORANGE,
   &layer4,
 };
 
 
 Layer fieldLayer = {		/* black outline */
   (AbShape *) &fieldOutline,
-  {screenWidth/2, screenHeight/2},/**< center */
+  {(screenWidth/2), (screenHeight/2)+20},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_BLACK,
+  COLOR_YELLOW,
   &layer3,
 };
 
-Layer layer1 = {	     /**< Layer with white moving circle */
+Layer layer1 = {	     /**< Layer with orange moving circle */
   (AbShape *)&circle4,
-  {screenWidth/2,(screenHeight/2)-58}, /**< center */
+  {(screenWidth/2), (screenHeight/2)+20}, /**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
+  COLOR_ORANGE,
   &fieldLayer,
 };
 
-Layer layer0 = {	  /**< Layer with white moving circle */
+Layer layer0 = {	  /**< Layer with orange moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2)+20, (screenHeight/2)-50}, /**< bit below & right of center */
+  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_WHITE,
+  COLOR_ORANGE,
   &layer1,
 };
 
