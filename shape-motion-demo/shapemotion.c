@@ -5,7 +5,7 @@
  *  While the CPU is running the green LED is on, and
  *  when the screen does not need to be redrawn the CPU
  *  is turned off along with the green LED.
- */  
+ */
 #include <msp430.h>
 #include <libTimer.h>
 #include <lcdutils.h>
@@ -17,103 +17,141 @@
 #define GREEN_LED BIT6
 
 
-AbRect rect10by20 = {abRectGetBounds, abRectCheck, {10,20}}; /**< 10x10 rectangle */
+AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
 AbRect rect15by5 = {abRectGetBounds, abRectCheck, {15,5}};
 
-AbRect rect20by20 = {abRectGetBounds, abRectCheck, {20,20}};
-
-AbRect rect35by30 = {abRectGetBounds, abRectCheck, {35,30}};
+AbRect rect10by3 = {abRectGetBounds, abRectCheck, {10,3}};
 
 AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 20};
 
 AbRect rect20 = {abRectGetBounds, abRectCheck, {10,30}}; /**< 10x10 rectangle */
 
 AbRectOutline fieldOutline = {	/* playing field */
-  abRectOutlineGetBounds, abRectOutlineCheck,   
-  {20,20}
+  abRectOutlineGetBounds, abRectOutlineCheck,
+  {screenWidth/2 - 10, screenHeight/2 - 10}
 };
 
-Layer chimneyTopLayer = {	  /* black 10x10 rectangle as a layer */
-  (AbShape *) &rect10by20,
+Layer leftArmLayer = {
+  (AbShape *)&rect10by3,
+  {(screenWidth/2)-25, (screenHeight/2)+10}, /**< black 10x3 rectangle */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_BLACK,
+  0,
+};
+
+Layer rightArmLayer = {
+  (AbShape *)&rect10by3,
+  {(screenWidth/2)+25, (screenHeight/2)+10}, /**< black 10x3 rectangle */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_BLACK,
+  &leftArmLayer,
+};
+
+Layer topHatLayer = {	  /* black 10x10 rectangle as a layer */
+  (AbShape *) &rect10,
   {(screenWidth/2), (screenHeight/2)-35},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_RED,
-  0,
+  COLOR_BLACK,
+  &rightArmLayer,
 
 };
 
-Layer rimLayer = {	    /* black 15x5 rectangle as a layer */
+Layer topSnowBallLayer = {	    /* top white circle as a layer */
+  (AbShape *) &circle15,
+  {(screenWidth/2), (screenHeight/2)-15},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_WHITE,
+  &topHatLayer,
+};
+
+
+Layer hatRimLayer = {	    /* black 15x5 rectangle as a layer */
   (AbShape *) &rect15by5,
   {(screenWidth/2), (screenHeight/2)-25},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_RED,
-  &chimneyTopLayer,
+  COLOR_BLACK,
+  &topSnowBallLayer,
 };
 
+Layer noseLayer = {	    /* nose orange circle as a layer */
+  (AbShape *) &circle4,
+  {(screenWidth/2), (screenHeight/2)-15},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_ORANGE,
+  &hatRimLayer,
+};
 
-Layer chimneyLayer = {	     /* middle white circle as a layer */
-  (AbShape *) &rect35by30,
+Layer middleSnowBallLayer = {	     /* middle white circle as a layer */
+  (AbShape *) &circle20,
   {(screenWidth/2), (screenHeight/2)+10},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_RED,
-  &rimLayer,
+  COLOR_WHITE,
+  &noseLayer,
 };
 
-Layer firePlaceLayer = {	    /* bottom white circle as a layer */
-  (AbShape *) &rect20by20,
-  {(screenWidth/2), (screenHeight/2)+20},/**< center */
+Layer bottomButtonLayer = {		/* wreath center as a layer */
+  (AbShape *) &circle4,
+  {screenWidth/2, (screenHeight/2)+8},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
   COLOR_BLACK,
-  &chimneyLayer,
+  &middleSnowBallLayer,
 };
 
-Layer fireLayer = {		/* wreath center as a layer */
-  (AbShape *) &circle8,
-  {screenWidth/2, (screenHeight/2)+30},/**< center */
+Layer topButtonLayer = {		/* wreath center as a layer */
+  (AbShape *) &circle4,
+  {screenWidth/2, (screenHeight/2)+4},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
-  &firePlaceLayer,
+  COLOR_BLACK,
+  &bottomButtonLayer,
 };
 
-Layer layer4 = {	     /**< Layer with orange  moving circle */
+Layer bottomSnowBallLayer = {	    /* bottom white circle as a layer */
+  (AbShape *) &circle25,
+  {(screenWidth/2), (screenHeight/2)+40},/**< center */
+  {0,0}, {0,0},				    /* last & next pos */
+  COLOR_WHITE,
+  &topButtonLayer,
+};
+
+Layer layer4 = {	     /**< Layer with white moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
+  {(screenWidth/2)+10, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
-  &fireLayer,
+  COLOR_WHITE,
+  &bottomSnowBallLayer,
 };
-  
 
-Layer layer3 = {	  /**< Layer with orange moving circle */
+
+Layer layer3 = {	  /**< Layer with white moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
+  {(screenWidth/2)-45, (screenHeight/2)-55}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
+  COLOR_WHITE,
   &layer4,
 };
 
 
 Layer fieldLayer = {		/* black outline */
   (AbShape *) &fieldOutline,
-  {(screenWidth/2), (screenHeight/2)+20},/**< center */
+  {screenWidth/2, screenHeight/2},/**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_YELLOW,
+  COLOR_BLACK,
   &layer3,
 };
 
-Layer layer1 = {	     /**< Layer with orange moving circle */
+Layer layer1 = {	     /**< Layer with white moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2), (screenHeight/2)+20}, /**< center */
+  {screenWidth/2,(screenHeight/2)-58}, /**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
+  COLOR_WHITE,
   &fieldLayer,
 };
 
-Layer layer0 = {	  /**< Layer with orange moving circle */
+Layer layer0 = {	  /**< Layer with white moving circle */
   (AbShape *)&circle4,
-  {(screenWidth/2), (screenHeight/2)+20}, /**< bit below & right of center */
+  {(screenWidth/2)+20, (screenHeight/2)-50}, /**< bit below & right of center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
+  COLOR_WHITE,
   &layer1,
 };
 
@@ -128,12 +166,14 @@ typedef struct MovLayer_s {
 } MovLayer;
 
 /* initial value of {0,0} will be overwritten */
- /**< not all layers move should be violet circle too*/
+ /**< not all layers move */
 
-MovLayer ml4 = { &layer4, {2,2}, 0};
-MovLayer ml3 = { &layer3, {1,1}, &ml4 }; //violet circle
-MovLayer ml1 = { &layer1, {1,2}, &ml3 }; 
-MovLayer ml0 = { &layer0, {2,1}, &ml1 };//violet circle  
+//MovLayer movBottomSnowBall = {&bottomSnowBallLayer, {5,0},0};
+//falling snowballs
+MovLayer ml4 = { &layer4, {0,2}, 0};
+MovLayer ml3 = { &layer3, {0,1}, &ml4 };
+MovLayer ml1 = { &layer1, {0,2}, &ml3 };
+MovLayer ml0 = { &layer0, {0,1}, &ml1 };
 
 
 movLayerDraw(MovLayer *movLayers, Layer *layers)
@@ -153,32 +193,32 @@ movLayerDraw(MovLayer *movLayers, Layer *layers)
   for (movLayer = movLayers; movLayer; movLayer = movLayer->next) { /* for each moving layer */
     Region bounds;
     layerGetBounds(movLayer->layer, &bounds);
-    lcd_setArea(bounds.topLeft.axes[0], bounds.topLeft.axes[1], 
+    lcd_setArea(bounds.topLeft.axes[0], bounds.topLeft.axes[1],
 		bounds.botRight.axes[0], bounds.botRight.axes[1]);
     for (row = bounds.topLeft.axes[1]; row <= bounds.botRight.axes[1]; row++) {
       for (col = bounds.topLeft.axes[0]; col <= bounds.botRight.axes[0]; col++) {
 	Vec2 pixelPos = {col, row};
 	u_int color = bgColor;
 	Layer *probeLayer;
-	for (probeLayer = layers; probeLayer; 
+	for (probeLayer = layers; probeLayer;
 	     probeLayer = probeLayer->next) { /* probe all layers, in order */
 	  if (abShapeCheck(probeLayer->abShape, &probeLayer->pos, &pixelPos)) {
 	    color = probeLayer->color;
-	    break; 
+	    break;
 	  } /* if probe check */
 	} // for checking all layers at col, row
-	lcd_writeColor(color); 
+	lcd_writeColor(color);
       } // for col
     } // for row
   } // for moving layer being updated
-}	  
+}
 
 
 
 //Region fence = {{10,30}, {SHORT_EDGE_PIXELS-10, LONG_EDGE_PIXELS-10}}; /**< Create a fence region */
 
 /** Advances a moving shape within a fence
- *  
+ *
  *  \param ml The moving shape to be advanced
  *  \param fence The region which will serve as a boundary for ml
  */
@@ -202,18 +242,18 @@ void mlAdvance(MovLayer *ml, Region *fence)
 }
 
 
-u_int bgColor = COLOR_BLUE;     /**< The background color */
+u_int bgColor = COLOR_PINK;     /**< The background color */
 int redrawScreen = 1;           /**< Boolean for whether screen needs to be redrawn */
 
 Region fieldFence;		/**< fence around playing field  */
 
 
-/** Initializes everything, enables interrupts and green LED, 
+/** Initializes everything, enables interrupts and green LED,
  *  and handles the rendering for the screen
  */
 void main()
 {
-  P1DIR |= GREEN_LED;		/**< Green led on when CPU on */		
+  P1DIR |= GREEN_LED;		/**< Green led on when CPU on */
   P1OUT |= GREEN_LED;
 
   configureClocks();
@@ -237,7 +277,7 @@ void main()
   or_sr(0x8);	              /**< GIE (enable interrupts) */
 
 
-  for(;;) { 
+  for(;;) {
     while (!redrawScreen) { /**< Pause CPU if screen doesn't need updating */
       P1OUT &= ~GREEN_LED;    /**< Green led off witHo CPU */
       or_sr(0x10);	      /**< CPU OFF */
