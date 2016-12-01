@@ -20,25 +20,19 @@
 #define SW3 BIT2
 #define SW4 BIT3
 
-int redrawScreen = 1;           /**< Boolean for whether screen needs to be redrawn */
-
+int redrawScreen = 1;  /**< Boolean for whether screen needs to be redrawn */
 Region fieldFence;		/**< fence around playing field  */
-
 int frostyOffset =0;
+u_int bgColor = COLOR_PINK;     /**< The background color */
 
-AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
-
+AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /* 10x10 rectangle*/
 AbRect rect15by5 = {abRectGetBounds, abRectCheck, {15,5}};
-
 AbRect rect10by3 = {abRectGetBounds, abRectCheck, {10,3}};
-
-AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 20};
-
-AbRect rect20 = {abRectGetBounds, abRectCheck, {10,30}}; /**< 10x10 rectangle */
+AbRect rect20 = {abRectGetBounds, abRectCheck, {10,30}}; /* 10x10 rectangle */
 
 AbRectOutline fieldOutline = {	/* playing field */
   abRectOutlineGetBounds, abRectOutlineCheck,
-  {screenWidth/2 - 10, screenHeight/2 - 10}
+  {screenWidth/2 - 10, screenHeight/2 - 20}
 };
 
 Layer leftArmLayer = {
@@ -131,7 +125,6 @@ Layer layer4 = {	     /**< Layer with white moving circle */
   &bottomSnowBallLayer,
 };
 
-
 Layer layer3 = {	  /**< Layer with white moving circle */
   (AbShape *)&circle4,
   {(screenWidth/2)-45, (screenHeight/2)-55}, /**< bit below & right of center */
@@ -139,7 +132,6 @@ Layer layer3 = {	  /**< Layer with white moving circle */
   COLOR_WHITE,
   &layer4,
 };
-
 
 Layer fieldLayer = {		/* black outline */
   (AbShape *) &fieldOutline,
@@ -204,7 +196,7 @@ void moveFrosty(MovLayer *ml, Region *fence){
   for (; ml; ml = ml->next) {
     vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);//add posnext + velocity stored in newPos
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
-    if(newPos.axes[0] + frostyOffset < screenWidth -25 && newPos.axes[0] + frostyOffset > 25){
+    if(newPos.axes[0]+frostyOffset>20 && newPos.axes[0] + frostyOffset<screenWidth-20){
       newPos.axes[0] += frostyOffset;
     }
     ml->layer->posNext = newPos;
@@ -215,10 +207,10 @@ void moveFrosty(MovLayer *ml, Region *fence){
 void checkButtons(){
  char switches = p2sw_read();
 
-  char S1pressed = !(switches & SW1) ? 0:1;
+  char S1pressed = (switches & SW1) ? 0:1;
   char S2pressed = (switches & SW2) ? 0:1;
   char S3pressed = (switches & SW3) ? 0:1;
-  char S4pressed = !(switches & SW4) ? 0:1;
+  char S4pressed = (switches & SW4) ? 0:1;
 
   if(S1pressed)//left
     frostyOffset = -20;
@@ -232,6 +224,32 @@ void checkButtons(){
   
 }
 
+
+/** Advances a moving shape within a fence
+ *
+ *  \param ml The moving shape to be advanced
+ *  \param fence The region which will serve as a boundary for ml
+ * Note that the fence is COLOR_PINK, which is the same color as
+ * the background
+ */
+
+void letItSnow(MovLayer *ml, Region *fence){
+  Vec2 newPos;
+  u_char axis;
+  Region shapeBoundary;
+  for(; ml; ml = ml->next){
+    vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
+    abShapeGetBounds(ml->layer->abShape, &newPos,&shapeBoundary);
+    //if snow reaches the bottom, move it to the top again
+    if(shapeBoundary.topLeft.axes[1] > screenHeight-20){
+      newPos.axes[1] = -10;
+      //ml->velocity.axes[1] += 1;
+      //make the color of the new snowballs white as you redraw them
+      ml->layer->color = COLOR_WHITE;
+    }
+    ml->layer->posNext = newPos;
+  }
+}
 
 movLayerDraw(MovLayer *movLayers, Layer *layers)
 {
@@ -270,40 +288,6 @@ movLayerDraw(MovLayer *movLayers, Layer *layers)
   } // for moving layer being updated
 }
 
-
-
-//Region fence = {{10,30}, {SHORT_EDGE_PIXELS-10, LONG_EDGE_PIXELS-10}}; /**< Create a fence region */
-
-/** Advances a moving shape within a fence
- *
- *  \param ml The moving shape to be advanced
- *  \param fence The region which will serve as a boundary for ml
- */
-void mlAdvance(MovLayer *ml, Region *fence)
-{
-  Vec2 newPos;
-  u_char axis;
-  Region shapeBoundary;
-  for (; ml; ml = ml->next) {
-    vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
-    abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
-    for (axis = 0; axis < 2; axis ++) {
-      if ((shapeBoundary.topLeft.axes[axis] < fence->topLeft.axes[axis]) ||
-	  (shapeBoundary.botRight.axes[axis] > fence->botRight.axes[axis]) ) {
-	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
-	newPos.axes[axis] += (2*velocity);
-      }	/**< if outside of fence */
-    } /**< for axis */
-    ml->layer->posNext = newPos;
-  } /**< for ml */
-}
-
-
-u_int bgColor = COLOR_PINK;     /**< The background color */
-
-
-
-
 /** Initializes everything, enables interrupts and green LED,
  *  and handles the rendering for the screen
  */
@@ -321,6 +305,9 @@ void main()
   layerGetBounds(&fieldLayer, &fieldFence);
 
 
+
+  
+
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
 
@@ -334,8 +321,10 @@ void main()
     P1OUT |= GREEN_LED;       /**< Green led on when CPU on */
     redrawScreen = 0;
     frostyOffset=0;
+    //    letItSnow(&ml0,&fieldFence);
     movLayerDraw(&ml0, &layer0);
-    movLayerDraw(&mLeftArmLayer, &leftArmLayer);
+    drawString5x7(10,10, "Frosty the Snowman!", COLOR_BLUE, COLOR_PINK);
+    //    movLayerDraw(&mLeftArmLayer, &leftArmLayer);
   }
 }
 
@@ -345,8 +334,8 @@ void wdt_c_handler()
   static short count = 0;
   P1OUT |= GREEN_LED;		      /**< Green LED on when cpu on */
   count ++;
-  if (count == 15) {
-    mlAdvance(&ml0, &fieldFence);
+  if (count == 15) {//call mlAdvance(&ml0, &fieldFence);
+    letItSnow(&ml0, &fieldFence);
     if (p2sw_read())
       redrawScreen = 1;
     count = 0;
