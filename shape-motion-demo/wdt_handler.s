@@ -56,3 +56,45 @@ ball_no_move:
 	.local	count
 	.comm	count,1,1
 	.ident	"GCC: (GNU) 4.9.1 20140707 (prerelease (msp430-14r1-364)) (GNUPro 14r1) (Based on: GCC 4.8 GDB 7.7 Binutils 2.24 Newlib 2.1)"
+
+/*checkButtons:
+	SUB #2, R1
+	CALL #p2sw_read
+	MOV R12, 0(R1)		; store return of p2sw_read in switches in 0(R1
+	AND 0(RI), SW1
+	JZ s1_not_pressed
+	MOV #1, 1(RI)		;S1pressed
+	JMP check_SW4
+
+s1_not_pressed:
+	MOV #0, 1(RI) 		;S1 wasn't pressed
+	JMP check_SW4
+
+check_SW4:
+	AND 0(R1), SW4
+	JZ s4_not_pressed
+	MOV #1, 2(R1) : S4 was pressed
+	JMP check_either_pressed
+	
+s4_not_pressed:
+	MOV #0. 2(R1) 		;S4 wasn't pressed
+	JMP check_either_pressed
+
+check_either_pressed:
+	BIS 1(R1), 2(R1)
+	JZ end
+	MOV &mLeftArmLayer, R12 ;parameter 1 for moveFrosty
+	MOV &fieldFence, R13	;parameter 2 for moveFrosty
+	CALL #moveFrosty
+	MOV #1, &redrawScreen
+	JMP end
+
+end:
+	pop R0
+	*/
+
+	
+	
+	
+	*/
+	
