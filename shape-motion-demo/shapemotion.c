@@ -15,9 +15,19 @@
 #include <abCircle.h>
 
 #define GREEN_LED BIT6
+#define SW1 BIT0
+#define SW2 BIT1
+#define SW3 BIT2
+#define SW4 BIT3
 
+int redrawScreen = 1;           /**< Boolean for whether screen needs to be redrawn */
+
+Region fieldFence;		/**< fence around playing field  */
+
+char frostyOffset =0;
 
 AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
+
 AbRect rect15by5 = {abRectGetBounds, abRectCheck, {15,5}};
 
 AbRect rect10by3 = {abRectGetBounds, abRectCheck, {10,3}};
@@ -168,12 +178,59 @@ typedef struct MovLayer_s {
 /* initial value of {0,0} will be overwritten */
  /**< not all layers move */
 
-//MovLayer movBottomSnowBall = {&bottomSnowBallLayer, {5,0},0};
+//Snowman
+
+MovLayer mLeftArmLayer = {&leftArmLayer,{5,0},0};
+/*MovLayer mRightArmLayer = {&rightArmLayer,{5,0},&mLeftArmLayer};
+MovLayer mtopHatLayer = {&topHatLayer,{5,0}, &mRightArmLayer};
+MovLayer mTopSnowBall = {&topSnowBallLayer,{5,0},&mtopHatLayer};
+MovLayer mHatRimLayer = {&hatRimLayer,{5,0},&mTopSnowBall};
+MovLayer mNoseLayer = {&noseLayer,{5,0},&mHatRimLayer};
+MovLayer mmSnowBall = {&middleSnowBallLayer,{5,0},&mNoseLayer};
+MovLayer mbButton = {&topButtonLayer, {5,0}, &mmSnowBall};
+MovLayer mtopButton = {&topButtonLayer, {5,0}, &mbButton};
+MovLayer mbSnowBall = {&bottomSnowBallLayer, {5,0},&mtopButton};*/
+
 //falling snowballs
 MovLayer ml4 = { &layer4, {0,2}, 0};
 MovLayer ml3 = { &layer3, {0,1}, &ml4 };
 MovLayer ml1 = { &layer1, {0,2}, &ml3 };
 MovLayer ml0 = { &layer0, {0,1}, &ml1 };
+
+void moveFrosty(MovLayer *ml, Region *fence){
+ Vec2 newPos;
+  u_char axis;
+  Region shapeBoundary;
+  for (; ml; ml = ml->next) {
+    vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);//add posnext + velocity stored in newPos
+    abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
+    if(newPos.axes[0] + frostyOffset < (screenWidth -25) && newPos.axes[0] + frostyOffset > 25){
+      newPos.axes[0] += frostyOffset;
+    }
+    ml->layer->posNext = newPos;
+   
+    } /**< for ml */
+}
+
+void checkButtons(){
+  u_int switches = p2sw_read();
+
+  char S1pressed = (switches & SW1) ? 0:1;
+  char S2pressed = (switches & SW2) ? 0:1;
+  char S3pressed = (switches & SW3) ? 0:1;
+  char S4pressed = (switches & SW4) ? 0:1;
+
+  if(S1pressed)//left
+    frostyOffset = -20;
+  if(S4pressed)//right
+    frostyOffset = 20;
+
+  if(S1pressed || S4pressed){
+    redrawScreen = 1;
+    moveFrosty(&mLeftArmLayer, &fieldFence);
+  }
+  
+}
 
 
 movLayerDraw(MovLayer *movLayers, Layer *layers)
@@ -243,9 +300,8 @@ void mlAdvance(MovLayer *ml, Region *fence)
 
 
 u_int bgColor = COLOR_PINK;     /**< The background color */
-int redrawScreen = 1;           /**< Boolean for whether screen needs to be redrawn */
 
-Region fieldFence;		/**< fence around playing field  */
+
 
 
 /** Initializes everything, enables interrupts and green LED,
@@ -262,7 +318,7 @@ void main()
     drawString5x7(20,20, "White Christmas", COLOR_GREEN, COLOR_RED);
   shapeInit();
   p2sw_init(1);
-
+  
 
   shapeInit();
 
@@ -281,10 +337,13 @@ void main()
     while (!redrawScreen) { /**< Pause CPU if screen doesn't need updating */
       P1OUT &= ~GREEN_LED;    /**< Green led off witHo CPU */
       or_sr(0x10);	      /**< CPU OFF */
+      checkButtons();
     }
     P1OUT |= GREEN_LED;       /**< Green led on when CPU on */
     redrawScreen = 0;
-    movLayerDraw(&ml0, &layer0);
+    frostyOffset=0;
+    //movLayerDraw(&ml0, &layer0);
+     movLayerDraw(&mLeftArmLayer, &leftArmLayer);
   }
 }
 
@@ -299,6 +358,6 @@ void wdt_c_handler()
     if (p2sw_read())
       redrawScreen = 1;
     count = 0;
-  }
+  } 
   P1OUT &= ~GREEN_LED;		    /**< Green LED off when cpu off */
 }
