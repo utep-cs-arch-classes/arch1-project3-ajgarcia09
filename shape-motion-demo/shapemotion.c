@@ -24,7 +24,7 @@ int redrawScreen = 1;           /**< Boolean for whether screen needs to be redr
 
 Region fieldFence;		/**< fence around playing field  */
 
-char frostyOffset =0;
+int frostyOffset =0;
 
 AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
 
@@ -180,7 +180,7 @@ typedef struct MovLayer_s {
 
 //Snowman
 
-MovLayer mLeftArmLayer = {&leftArmLayer,{5,0},0};
+MovLayer mLeftArmLayer = {&leftArmLayer,{0,0},0};
 /*MovLayer mRightArmLayer = {&rightArmLayer,{5,0},&mLeftArmLayer};
 MovLayer mtopHatLayer = {&topHatLayer,{5,0}, &mRightArmLayer};
 MovLayer mTopSnowBall = {&topSnowBallLayer,{5,0},&mtopHatLayer};
@@ -204,7 +204,7 @@ void moveFrosty(MovLayer *ml, Region *fence){
   for (; ml; ml = ml->next) {
     vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);//add posnext + velocity stored in newPos
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
-    if(newPos.axes[0] + frostyOffset < (screenWidth -25) && newPos.axes[0] + frostyOffset > 25){
+    if(newPos.axes[0] + frostyOffset < screenWidth -25 && newPos.axes[0] + frostyOffset > 25){
       newPos.axes[0] += frostyOffset;
     }
     ml->layer->posNext = newPos;
@@ -213,12 +213,12 @@ void moveFrosty(MovLayer *ml, Region *fence){
 }
 
 void checkButtons(){
-  u_int switches = p2sw_read();
+ char switches = p2sw_read();
 
-  char S1pressed = (switches & SW1) ? 0:1;
+  char S1pressed = !(switches & SW1) ? 0:1;
   char S2pressed = (switches & SW2) ? 0:1;
   char S3pressed = (switches & SW3) ? 0:1;
-  char S4pressed = (switches & SW4) ? 0:1;
+  char S4pressed = !(switches & SW4) ? 0:1;
 
   if(S1pressed)//left
     frostyOffset = -20;
@@ -226,8 +226,8 @@ void checkButtons(){
     frostyOffset = 20;
 
   if(S1pressed || S4pressed){
-    redrawScreen = 1;
-    moveFrosty(&mLeftArmLayer, &fieldFence);
+     moveFrosty(&mLeftArmLayer, &fieldFence);
+     redrawScreen = 1;
   }
   
 }
@@ -313,19 +313,11 @@ void main()
   P1OUT |= GREEN_LED;
 
   configureClocks();
-
   lcd_init();
-    drawString5x7(20,20, "White Christmas", COLOR_GREEN, COLOR_RED);
-  shapeInit();
   p2sw_init(1);
-  
-
-  shapeInit();
-
+ 
   layerInit(&layer0);
   layerDraw(&layer0);
-
-
   layerGetBounds(&fieldLayer, &fieldFence);
 
 
@@ -342,8 +334,8 @@ void main()
     P1OUT |= GREEN_LED;       /**< Green led on when CPU on */
     redrawScreen = 0;
     frostyOffset=0;
-    //movLayerDraw(&ml0, &layer0);
-     movLayerDraw(&mLeftArmLayer, &leftArmLayer);
+    movLayerDraw(&ml0, &layer0);
+    movLayerDraw(&mLeftArmLayer, &leftArmLayer);
   }
 }
 
