@@ -6,6 +6,8 @@ Each shape is created using a Layer struct (found in shape.h).
 
 Movable layers are stored in a linked list of struct type MovLayer (defined in shapemotion.c).
 
+The GREEN LED flashes every time the screen is redrawn.
+
 I modified the method mlAdvance() found in the original code and renamed it letItSnow(). mlAdvance() made movable layers bounce off the margins of a "fence" boundary. Instead, letItSnow() allows the shapes to move from the top of the screen and once they reach the bottom, the shapes are redrawn at the top of the screen. This simulates falling snow.
 
 To test it out make sure your MSP430 is connected and recognized by your device.
